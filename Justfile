@@ -83,6 +83,13 @@ fmt-check:
 lint:
     cargo clippy --all-targets -- -D warnings
 
+# --- Aufraeumen ------------------------------------------------------------
+
+# Build-Cache target/ loeschen (oft mehrere GB). Code, .env und Datenbank bleiben.
+clean:
+    cargo clean
+    @echo "Der naechste Build uebersetzt alles neu und dauert einige Minuten."
+
 # --- Container -------------------------------------------------------------
 
 # Abbild bauen.

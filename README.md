@@ -170,6 +170,7 @@ just db-shell     # psql öffnen
 just mail-up      # Mailpit starten, Mails ansehen unter http://localhost:58025
 just db-reset     # Datenbank verwerfen und neu anlegen
 just up           # alles im Container starten
+just clean        # Build-Cache löschen (target/, oft mehrere GB)
 ```
 
 ## Lizenz
