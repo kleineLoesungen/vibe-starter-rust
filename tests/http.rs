@@ -1109,3 +1109,107 @@ async fn testmail_an_ungueltige_adresse_wird_abgewiesen(db: PgPool) {
     assert!(text(antwort).await.contains("Versand fehlgeschlagen"));
     assert!(postfach.lock().unwrap().is_empty());
 }
+
+// --- Version und Update-Prüfung ---------------------------------------------
+
+/// Installierte Version in der Schreibweise, die die Oberfläche zeigt.
+fn version_label() -> String {
+    let v = starter::changelog::installed_version().expect("CHANGELOG.md hat eine Version");
+    starter::changelog::version_label(&v)
+}
+
+#[sqlx::test]
+async fn systemseite_zeigt_die_installierte_version(db: PgPool) {
+    admin(&db, "version@example.com").await;
+    let app = anwendung(db).await;
+    let cookie = anmelden(&app, "version@example.com", "einsehrlangespasswort").await;
+
+    let html = text(
+        app.oneshot(
+            Request::get("/admin/system")
+                .header(header::COOKIE, &cookie)
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap(),
+    )
+    .await;
+
+    assert!(
+        html.contains(&version_label()),
+        "Version fehlt auf der Systemseite"
+    );
+    // Ohne UPDATE_CHECK_URL wird nichts abgerufen; die Prüfung ist dann aus.
+    assert!(html.contains("UPDATE_CHECK_URL"));
+}
+
+#[sqlx::test]
+async fn fusszeile_zeigt_die_version(db: PgPool) {
+    admin(&db, "fuss@example.com").await;
+    let app = anwendung(db).await;
+    let cookie = anmelden(&app, "fuss@example.com", "einsehrlangespasswort").await;
+
+    let html = text(
+        app.oneshot(
+            Request::get("/dashboard")
+                .header(header::COOKIE, &cookie)
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap(),
+    )
+    .await;
+
+    assert!(html.contains(&format!("Version {}", version_label())));
+}
+
+#[sqlx::test]
+async fn ohne_anmeldung_ist_die_version_nirgends_zu_sehen(db: PgPool) {
+    // `/styleguide` ist öffentlich und erbt dieselbe Fußzeile. Das
+    // Veröffentlichungsdatum verrät sonst jedem, welche Korrekturen fehlen.
+    let app = anwendung(db).await;
+
+    let html = text(
+        app.oneshot(Request::get("/styleguide").body(Body::empty()).unwrap())
+            .await
+            .unwrap(),
+    )
+    .await;
+
+    assert!(
+        !html.contains(&version_label()),
+        "die Version darf ohne Anmeldung nicht sichtbar sein"
+    );
+}
+
+#[sqlx::test]
+async fn pruefung_ausloesen_ist_administratoren_vorbehalten(db: PgPool) {
+    admin(&db, "chef@example.com").await;
+    user::create(
+        &db,
+        "normal@example.com",
+        "Normal",
+        "einsehrlangespasswort",
+        Role::User,
+    )
+    .await
+    .unwrap();
+    let app = anwendung(db).await;
+    let cookie = anmelden(&app, "normal@example.com", "einsehrlangespasswort").await;
+
+    let antwort = app
+        .oneshot(
+            Request::post("/admin/system/update-check")
+                .header("sec-fetch-site", "same-origin")
+                .header(header::COOKIE, &cookie)
+                .header(header::CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+
+    assert_eq!(antwort.status(), StatusCode::FORBIDDEN);
+}

@@ -84,7 +84,8 @@ Ende. Zeigt `git remote -v` noch auf das Kit: `git remote remove origin`.
 | Installierbar | PWA mit Manifest, Icons und Offline-Seite; Name und Farben per Umgebung |
 | E-Mail | SMTP per `SMTP_URL`, lokal Mailpit, Testmail unter **System** |
 | Container | Mehrstufiges Dockerfile, unprivilegierter Benutzer |
-| Tests | 91 Tests, jeder mit eigener frischer Datenbank |
+| Version | `CHANGELOG.md` ist die Version; Anzeige unter **System**, Hinweis auf neuere Versionen |
+| Tests | 114 Tests, jeder mit eigener frischer Datenbank |
 
 ---
 
@@ -156,6 +157,25 @@ docs/                   Ausführliche Dokumentation
 
 Der **Styleguide** unter [/styleguide](http://localhost:3000/styleguide) zeigt jede
 Komponente im echten Zustand — mit Reglern zum Ausprobieren von Farbe und Rundung.
+
+---
+
+## Arbeiten mit KI-Assistenten
+
+Das Kit bringt ein festes Vorgehen mit, das in jedem abgeleiteten Projekt ab
+dem ersten Commit vorhanden ist:
+
+| Datei | Wirkung |
+|---|---|
+| `CLAUDE.md` | gilt immer: Regeln, Fallstricke, Stack |
+| `.claude/skills/spec/` | `/spec` — erst Spezifikation, dann Code |
+| `.claude/skills/deploy/` | `/deploy` — fester Ablauf fürs Ausrollen |
+| `.claude/agents/` | Subagents `code-reviewer` und `security-reviewer` |
+| `.claude/hooks/pre-bash.sh` | führt vor jedem Commit `just check` aus und weist datenlöschende Befehle ab |
+
+Der Hook ist das Sicherheitsnetz anstelle einer CI: Ein roter `just check`
+verhindert den Commit, und die Meldung sagt, was zu tun ist — auch im
+häufigsten Fall „Datenbank läuft nicht".
 
 ---
 

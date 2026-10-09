@@ -23,6 +23,8 @@ Diese Liste durchgehen:
 - [ ] `APP_NAME`, `APP_SHORT_NAME`, `PWA_THEME_COLOR` gesetzt. Die Werte landen
       im Manifest; eine bereits installierte App übernimmt Namensänderungen je
       nach Gerät erst verzögert oder nach Neuinstallation.
+- [ ] Neuer Eintrag in `CHANGELOG.md` mit dem Datum dieser Veröffentlichung.
+      Die oberste Überschrift ist die Version, die die Instanz anzeigt.
 - [ ] Datenbanksicherung eingerichtet **und einmal zurückgespielt**.
 - [ ] `RUST_LOG=starter=info` — `debug` protokolliert deutlich mehr.
 - [ ] Erstes Konto anlegen und prüfen, dass es Administrator ist.
@@ -51,6 +53,38 @@ damit auch die Datenbankverbindung, nicht nur den Prozess.
 **Passwörter nicht als `-e` übergeben**, sie stehen sonst in `docker inspect`
 und in der Shell-Historie. Docker Secrets, Kubernetes Secrets oder eine
 `--env-file` mit engen Dateirechten benutzen.
+
+---
+
+## Version und Update-Hinweis
+
+Die installierte Version ist die oberste Überschrift in `CHANGELOG.md`. Sie
+steht unter **System** und klein in der Fußzeile.
+
+Mit
+
+```bash
+UPDATE_CHECK_URL=https://raw.githubusercontent.com/konto/repo/master/CHANGELOG.md
+```
+
+vergleicht die Instanz ihre Version höchstens **einmal täglich** mit dieser
+Datei und zeigt Administratoren neuere Einträge. Sie lädt nichts herunter und
+installiert nichts.
+
+Zwei Punkte dazu:
+
+- **Die Instanz spricht dabei nach außen** und verrät der Gegenstelle ihre
+  IP-Adresse. Wer das nicht will, lässt die Variable leer — dann findet kein
+  Netzzugriff statt.
+- Die Datei muss **öffentlich lesbar** sein. Für private Repositories bräuchte
+  es ein Zugangstoken; das ist nicht eingebaut. Kein Token in die Adresse
+  schreiben — sie taucht im Log auf (ohne Query, aber darauf sollte man sich
+  nicht verlassen).
+- Umleitungen folgt die Anwendung nur zu `https` und höchstens dreimal. Sonst
+  könnte die Gegenstelle den Server auf eine interne Adresse schicken.
+
+Ist die Gegenstelle nicht erreichbar, bleibt der zuletzt bekannte Stand stehen
+und wird als veraltet gekennzeichnet. Die Anwendung läuft unberührt weiter.
 
 ---
 

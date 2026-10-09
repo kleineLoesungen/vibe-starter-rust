@@ -48,4 +48,5 @@ pub fn routes() -> Router<AppState> {
         .route("/admin/tokens/{id}/revoke", post(tokens::revoke))
         .route("/admin/system", get(system::index))
         .route("/admin/system/testmail", post(system::testmail))
+        .route("/admin/system/update-check", post(system::update_check))
 }

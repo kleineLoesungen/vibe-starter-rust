@@ -26,6 +26,10 @@ pub struct Config {
     pub branding: Branding,
     /// E-Mail-Versand.
     pub mail: MailConfig,
+    /// Rohdatei, gegen die die Version abgeglichen wird, z. B.
+    /// `https://raw.githubusercontent.com/konto/repo/master/CHANGELOG.md`.
+    /// `None` bedeutet: keine Prüfung, kein Netzzugriff.
+    pub update_check_url: Option<String>,
 }
 
 /// Erscheinungsbild nach aussen: Seitentitel, installierte App, Browserleiste.
@@ -98,6 +102,10 @@ impl Config {
             trust_proxy: optional("TRUST_PROXY", "false").parse()?,
             branding,
             mail,
+            update_check_url: std::env::var("UPDATE_CHECK_URL")
+                .ok()
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty()),
         })
     }
 
@@ -115,6 +123,7 @@ impl Config {
                 smtp_url: None,
                 from: "Starter <noreply@localhost>".into(),
             },
+            update_check_url: None,
         }
     }
 }

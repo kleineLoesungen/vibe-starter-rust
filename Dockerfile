@@ -44,6 +44,9 @@ RUN mkdir -p src && echo "fn main() {}" > src/main.rs && echo "" > src/lib.rs \
 COPY src/ src/
 COPY templates/ templates/
 COPY migrations/ migrations/
+# Wird mit include_str! in die Binary eingebettet — ohne diese Zeile schlaegt
+# der Build fehl, und kein Test wuerde das bemerken.
+COPY CHANGELOG.md ./
 # Askama liest die Templates zur Compile-Zeit ein, sqlx::migrate! die Migrationen.
 # Beide muessen daher VOR dem Build vorliegen.
 RUN touch src/main.rs src/lib.rs && cargo build --release --locked

@@ -38,6 +38,17 @@ pub fn set_branding(branding: crate::config::Branding) {
     let _ = BRANDING.set(branding);
 }
 
+/// Installierte Version in deutscher Schreibweise, einmal berechnet.
+/// `None`, wenn `CHANGELOG.md` keinen gültigen Eintrag hat.
+pub fn app_version() -> Option<&'static str> {
+    static VERSION: std::sync::OnceLock<Option<String>> = std::sync::OnceLock::new();
+    VERSION
+        .get_or_init(|| {
+            crate::changelog::installed_version().map(|v| crate::changelog::version_label(&v))
+        })
+        .as_deref()
+}
+
 pub fn branding() -> &'static crate::config::Branding {
     BRANDING.get_or_init(crate::config::Branding::default)
 }
@@ -51,6 +62,8 @@ pub struct Layout {
     pub theme_color: &'static str,
     /// Name unter dem Icon auf dem Startbildschirm.
     pub app_short_name: &'static str,
+    /// Installierte Version für die Fußzeile — nur für Angemeldete.
+    pub version: Option<&'static str>,
     pub user: Option<User>,
     pub path: String,
 }
@@ -62,6 +75,10 @@ impl Layout {
             app_name: &branding().name,
             theme_color: &branding().theme_color,
             app_short_name: &branding().short_name,
+            // Die Version ist ein Hinweis für Betreiber. Ohne Anmeldung bleibt
+            // sie aus: `/styleguide` ist öffentlich, und ein Veröffentlichungs-
+            // datum verrät sonst jedem, welche Korrekturen noch fehlen.
+            version: user.as_ref().and_then(|_| app_version()),
             user,
             path: path.into(),
         }
@@ -375,6 +392,12 @@ pub struct SystemPage {
     pub test_mail_to: String,
     pub sent: bool,
     pub error: Option<String>,
+    /// Ergebnis des Abgleichs mit `UPDATE_CHECK_URL`.
+    pub update: crate::changelog::check::UpdateStatus,
+    /// Änderungen der installierten und der drei vorherigen Versionen.
+    pub changelog: Vec<crate::changelog::Entry>,
+    /// Rückmeldung des Knopfes „Jetzt prüfen".
+    pub checked: Option<&'static str>,
 }
 
 /// Seite fuer den Fall ohne Netz. Wird vom Service Worker vorgehalten.

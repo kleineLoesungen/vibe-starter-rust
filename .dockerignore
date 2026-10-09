@@ -3,4 +3,6 @@
 /.git
 .env
 *.md
+# Ausnahme: CHANGELOG.md wird beim Kompilieren eingebettet (include_str!).
+!CHANGELOG.md
 /docs

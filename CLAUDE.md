@@ -290,10 +290,40 @@ Commit abfängt. Deshalb:
 * Ein Test, der nur durch Anpassen der Erwartung grün wird, ist verdächtig —
   erst klären, ob der Code oder der Test falsch ist.
 
+Bei nennenswerten Änderungen zusätzlich einen Eintrag in `CHANGELOG.md`.
 Bei Template- oder CSS-Änderungen zusätzlich `just css`.
 Nach einer Änderung an `assets/icons/*.svg` zusätzlich `./scripts/icons.sh`.
 Wer `--brand-hue` in `theme.css` ändert, zieht `PWA_THEME_COLOR` und die
 Icon-Farbe nach — siehe [docs/DESIGN.md](docs/DESIGN.md#1-der-schnellste-weg-eine-zahl).
+
+---
+
+## Changelog ist die Version
+
+`CHANGELOG.md` wird von Hand gepflegt, und die **oberste Überschrift ist die
+Version**, die die Anwendung von sich meldet. Es gibt keine Versionsnummer in
+`Cargo.toml`, die nachgezogen werden müsste.
+
+```markdown
+## 2026.10.09
+- Suche in der Benutzerliste
+- Migration: 0006_projects.sql
+```
+
+* Format `JJJJ.MM.TT`, bei mehreren Veröffentlichungen am selben Tag `.2`, `.3`.
+* Einträge sind für **Betreiber** geschrieben, nicht für Entwickler. Nicht der
+  Commit-Titel, sondern was sich für die Benutzung ändert.
+* Zeilen mit `Migration:` werden getrennt hervorgehoben.
+* **Jede nennenswerte Änderung bekommt einen Eintrag** — am besten im selben
+  Commit. Eine neue Version anlegen heißt: eine neue Überschrift mit dem Datum.
+
+Die Datei wird mit `include_str!` eingebettet. Sie muss deshalb beim
+Kompilieren vorhanden sein — auch im Docker-Build (`Dockerfile`,
+`.dockerignore`). Wer daran etwas ändert: `just build` prüft das, Tests nicht.
+
+Mit gesetztem `UPDATE_CHECK_URL` vergleicht die Anwendung ihre Version
+höchstens täglich mit der Rohdatei im Repository und zeigt Administratoren
+neuere Einträge. Ohne die Variable passiert nichts, auch kein Netzzugriff.
 
 ---
 

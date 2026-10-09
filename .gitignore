@@ -6,3 +6,6 @@
 # Erzeugtes Stylesheet. Wird von `just css` gebaut und beim Container-Build
 # ohnehin neu erzeugt — gehoert deshalb nicht in die Versionsverwaltung.
 /static/app.css
+
+# Persönliche Einstellungen, gehören nicht ins Repository.
+.claude/settings.local.json

@@ -170,6 +170,19 @@ ersetze docs/DEPLOY.md '--name starter' "--name $NAME"
 ersetze docs/DEPLOY.md 'docker stop starter && docker rm starter' "docker stop $NAME && docker rm $NAME"
 ersetze docs/DEPLOY.md 'db.example.com/starter?' "db.example.com/$IDENT?"
 
+# Changelog zuruecksetzen: Ein Projekt aus dem Kit hat seine eigene Geschichte.
+# Ohne das zeigte es die Versionen des Kits an.
+cat > CHANGELOG.md <<CHANGELOG
+# Änderungen
+
+Neueste Version oben. Eine Überschrift je Version im Format \`JJJJ.MM.TT\`,
+bei mehreren Veröffentlichungen am selben Tag mit angehängter Zählung (\`.2\`).
+Die oberste Überschrift ist die Version, die die Anwendung von sich meldet.
+
+## $(date +%Y.%m.%d)
+- Projekt aus dem Kit angelegt
+CHANGELOG
+
 # Cargo.lock nachziehen: Nur der Name des eigenen Pakets aendert sich,
 # keine Abhaengigkeit wird aktualisiert. Wichtig fuer "cargo build --locked"
 # im Dockerfile.
@@ -214,4 +227,7 @@ Nächste Schritte:
 Danach nach Belieben: README-Titel, Icons (assets/icons/), --brand-hue in
 assets/css/theme.css. Zeigt 'git remote -v' noch auf das Kit:
   git remote remove origin
+
+Für den Hinweis auf neuere Versionen in .env eintragen (eigenes Repository):
+  UPDATE_CHECK_URL=https://raw.githubusercontent.com/<konto>/$NAME/master/CHANGELOG.md
 FERTIG

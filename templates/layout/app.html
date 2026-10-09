@@ -80,6 +80,9 @@
       <span>{{ layout.app_name }}</span>
       <a href="/styleguide" class="hover:text-content">Styleguide</a>
       <a href="/api/v1/health" class="hover:text-content">API-Status</a>
+      {% if let Some(version) = layout.version %}
+        <span class="ml-auto">Version {{ version }}</span>
+      {% endif %}
     </div>
   </footer>
 </div>

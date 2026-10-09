@@ -8,4 +8,5 @@
 pub mod api_token;
 pub mod login_attempt;
 pub mod note;
+pub mod settings;
 pub mod user;
