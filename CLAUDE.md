@@ -297,6 +297,25 @@ Icon-Farbe nach — siehe [docs/DESIGN.md](docs/DESIGN.md#1-der-schnellste-weg-e
 
 ---
 
+## Werkzeuge in diesem Repository
+
+Unter `.claude/` liegt ein festes Vorgehen, das in jedem Projekt aus diesem
+Kit sofort da ist:
+
+| Was | Wofür |
+|---|---|
+| `/spec <Beschreibung>` | Neue Funktion: erst Fragen klären, Spezifikation nach `docs/specs/` schreiben, auf Freigabe warten. Kein Code vorher. |
+| `/deploy <Ziel>` | Ausrollen nach festem Ablauf: prüfen, sichern, bauen, Rauchtest. Startet nur auf ausdrückliche Anweisung. |
+| Subagent `code-reviewer` | Prüft den Diff gegen diese Regeln. Vor dem Commit. |
+| Subagent `security-reviewer` | Prüft Berechtigungen, Datentrennung, Eingaben, Geheimnisse. Nach Änderungen an Anmeldung, Rollen, Scopes, SQL. |
+
+Dazu ein Hook (`.claude/hooks/pre-bash.sh`), der vor jedem `git commit`
+`just check` ausführt und bei rotem Ergebnis abbricht. Er weist außerdem
+Befehle ab, die das Datenbank-Volume löschen würden. Ein Commit lässt sich
+damit nicht an der Prüfung vorbeischmuggeln — auch nicht versehentlich.
+
+---
+
 ## Wiederkehrende Aufgaben
 
 Für „wie füge ich eine Seite / eine Ressource / ein Feld hinzu" gibt es
